@@ -3,6 +3,10 @@ module.exports = {
         host: 'localhost',
         disableHostCheck: true
     },
+    transpileDependencies: [
+        'vue-echarts',
+        'resize-detector'
+    ],
     pluginOptions: {
         electronBuilder: {
             builderOptions: {
