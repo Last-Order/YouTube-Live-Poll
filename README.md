@@ -1,4 +1,4 @@
-# YouTueb-Live-Poll
+# YouTube-Live-Poll
 
 创建投票，并收集聊天栏数据统计结果，提供为 OBS 设计的显示界面。
 
