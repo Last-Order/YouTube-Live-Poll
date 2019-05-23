@@ -6,6 +6,8 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 const path = require('path');
+const { fork } = require('child_process')
+const ps = fork(`${__static}/server/index.js`)
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will

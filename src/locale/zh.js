@@ -14,10 +14,15 @@ export default {
         'start': '开始投票',
         'end': '结束投票',
         'noVideoUrl': '请填写直播地址',
-        'failToGetVideoId': '无法解析视频地址'
+        'failToGetVideoId': '无法解析视频地址',
+        'noOptions': '未设置投票选项'
     },
     'result': {
         'title': '结果'
+    },
+    'display': {
+        'title': '展示',
+        'instruction': '请在 OBS Studio 中添加浏览器源，输入以上地址'
     },
     "noDataText": "无可用数据"
 }

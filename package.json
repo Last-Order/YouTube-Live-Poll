@@ -29,8 +29,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "echarts": "^4.2.1",
+    "express": "^4.17.0",
     "flv.js": "^1.5.0",
     "hls.js": "^0.12.3",
+    "socket.io": "^2.2.0",
     "vue": "^2.6.6",
     "vue-echarts": "^4.0.3",
     "vue-grid-layout": "^2.3.4",

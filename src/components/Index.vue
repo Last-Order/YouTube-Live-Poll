@@ -36,7 +36,7 @@
             <h3>{{ $vuetify.t('$vuetify.index.setPollOptions') }}</h3>
             <poll-option-list :options="options" @delete="handlePollOptionDelete"/>
             <v-btn flat>{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
-            <v-btn color="primary" flat>{{ $vuetify.t('$vuetify.index.saveOptions') }}</v-btn>
+            <v-btn color="primary" flat @click="saveOptions">{{ $vuetify.t('$vuetify.index.saveOptions') }}</v-btn>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -49,6 +49,11 @@
               @click="start"
               :loading="startButtonLoading"
             >{{ $vuetify.t('$vuetify.control.start') }}</v-btn>
+            <v-btn
+              v-if="status === 'polling'"
+              color="red"
+              @click="stop"
+            >{{ $vuetify.t('$vuetify.control.end') }}</v-btn>
           </v-card-text>
         </v-card>
         <v-card class="index-cards">
@@ -56,6 +61,13 @@
             <h3>{{ $vuetify.t('$vuetify.result.title') }}</h3>
           </v-card-text>
           <result-graph v-if="resultGraphData.length > 0" :graph="resultGraphData" />
+        </v-card>
+        <v-card class="index-cards">
+          <v-card-text>
+            <h3>{{ $vuetify.t('$vuetify.display.title') }}</h3>
+            <blockquote><code>http://localhost:9317</code></blockquote>
+            <p>{{ $vuetify.t('$vuetify.display.instruction') }}</p>
+          </v-card-text>
         </v-card>
       </v-flex>
     </v-layout>
@@ -66,7 +78,8 @@ import SetAPIKeyDialog from "./Home/SetAPIKey";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
 import YouTube from "../services/youtube";
-import utils from "../utils/common";
+const fs = require('fs');
+const path = require('path');
 import "./Index.css";
 
 export default {
@@ -87,9 +100,7 @@ export default {
         message: ""
       },
       options: [
-        {
-          label: "XXXXXX"
-        }
+        
       ],
       result: {
         
@@ -104,7 +115,10 @@ export default {
           value: "ja"
         }
       ],
-      nowLanguage: "zh"
+      nowLanguage: "zh",
+      status: 'idle',
+      pollingInterval: undefined,
+      nextPageToken: undefined
     };
   },
   mounted() {
@@ -143,16 +157,21 @@ export default {
       }
     },
     async start() {
-      const apiKey = localStorage.getItem("api_key");
       if (!this.videoUrl) {
         return this.showErrorMessage(
           this.$vuetify.t("$vuetify.control.noVideoUrl")
         );
       }
+      if (this.options.length === 0) {
+        return this.showErrorMessage(
+          this.$vuetify.t("$vuetify.control.noOptions")
+        );
+      }
       this.startButtonLoading = true;
+      // Get live basic information
       try {
         this.videoId = await YouTube.getVideoId(this.videoUrl);
-        this.chatId = await YouTube.getChatId(this.videoId, apiKey);
+        this.chatId = await YouTube.getChatId(this.videoId, this.apiKey);
       } catch (e) {
         this.startButtonLoading = false;
         return this.showErrorMessage(
@@ -160,14 +179,48 @@ export default {
         );
       }
       this.startButtonLoading = false;
+      // reset result
       const result = {};
       for (const index in this.options) {
         result[String.fromCharCode(65 + parseInt(index))] = 0;
       }
       this.result = result;
+      this.status = 'polling';
+      // start polling to retrieve live comments
+      this.pollingInterval = setInterval(this.polling, 10000);
+    },
+    async stop() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval);
+        this.status = 'idle';
+      }
     },
     async polling() {
-      let retries = 3;
+      try {
+        const messages = YouTube.getChatMessages(this.chatId, this.apiKey, this.nextPageToken);
+        this.nextPageToken = messages.nextPageToken;
+        for (const item of messages.items) {
+          const charCode = item.snippet.displayMessage[0].toUpperCase().charCodeAt();
+          let userOption;
+          // options available from 'A' to 'Z'
+          if (charCode >= 65 && charCode <= 90) {
+            userOption = String.fromCharCode(charCode);
+          }
+          // and also 'Ａ' to 'Ｚ'
+          if (charCode >= 65313 && charCode <= 65338){
+            userOption = String.fromCharCode(charCode - 65248);
+          }
+          if (userOption && this.result[userOption] !== undefined) {
+            this.result[userOption] += 1;
+          }
+        }
+      } catch (e) {
+        this.showErrorMessage(e.toString());
+      }
+    },
+    saveOptions() {
+      // eslint-disable-next-line
+      fs.writeFileSync(path.resolve(__static, './server/options.json'), JSON.stringify(this.options));
     },
     handlePollOptionDelete(index) {
       this.options = [
