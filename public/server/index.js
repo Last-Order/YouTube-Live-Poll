@@ -1,4 +1,5 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const fs = require('fs');
@@ -18,7 +19,7 @@ app.get('/options', (req, res) => {
   );
 });
 
-app.use('/assets', app.static(path.join(__dirname, '../assets')));
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
 io.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });

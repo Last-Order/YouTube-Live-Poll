@@ -36,7 +36,11 @@
             <h3>{{ $vuetify.t('$vuetify.index.setPollOptions') }}</h3>
             <poll-option-list :options="options" @delete="handlePollOptionDelete"/>
             <v-btn flat>{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
-            <v-btn color="primary" flat @click="saveOptions">{{ $vuetify.t('$vuetify.index.saveOptions') }}</v-btn>
+            <v-btn
+              color="primary"
+              flat
+              @click="saveOptions"
+            >{{ $vuetify.t('$vuetify.index.saveOptions') }}</v-btn>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -60,12 +64,14 @@
           <v-card-text>
             <h3>{{ $vuetify.t('$vuetify.result.title') }}</h3>
           </v-card-text>
-          <result-graph v-if="resultGraphData.length > 0" :graph="resultGraphData" />
+          <result-graph :graph="result"/>
         </v-card>
         <v-card class="index-cards">
           <v-card-text>
             <h3>{{ $vuetify.t('$vuetify.display.title') }}</h3>
-            <blockquote><code>http://localhost:9317</code></blockquote>
+            <blockquote>
+              <code>http://localhost:9317</code>
+            </blockquote>
             <p>{{ $vuetify.t('$vuetify.display.instruction') }}</p>
           </v-card-text>
         </v-card>
@@ -78,8 +84,9 @@ import SetAPIKeyDialog from "./Home/SetAPIKey";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
 import YouTube from "../services/youtube";
-const fs = require('fs');
-const path = require('path');
+import utils from "../utils/common";
+const fs = require("fs");
+const path = require("path");
 import "./Index.css";
 
 export default {
@@ -100,11 +107,14 @@ export default {
         message: ""
       },
       options: [
-        
+        {
+          label: "AAAAA"
+        },
+        {
+          label: "BBBBB"
+        }
       ],
-      result: {
-        
-      },
+      result: {},
       languages: [
         {
           label: "中文",
@@ -116,29 +126,16 @@ export default {
         }
       ],
       nowLanguage: "zh",
-      status: 'idle',
+      status: "idle",
       pollingInterval: undefined,
-      nextPageToken: undefined
+      nextPageToken: undefined,
+      startedAt: new Date()
     };
   },
   mounted() {
     this.checkInstall();
     if (localStorage.getItem("language")) {
       this.nowLanguage = localStorage.getItem("language");
-    }
-  },
-  computed: {
-    resultGraphData() {
-      // const optionMap = {};
-      // for (const index in this.options) {
-      //   optionMap[String.fromCharCode(65 + index)] = this.options[index].label;
-      // }
-      return Array.from(Object.keys(this.result), index => {
-        return {
-          label: index,
-          value: this.result[index]
-        };
-      });
     }
   },
   watch: {
@@ -156,6 +153,9 @@ export default {
         this.showSetAPIKeyDialog = true;
       }
     },
+    /**
+     * Start polling
+     */
     async start() {
       if (!this.videoUrl) {
         return this.showErrorMessage(
@@ -185,42 +185,69 @@ export default {
         result[String.fromCharCode(65 + parseInt(index))] = 0;
       }
       this.result = result;
-      this.status = 'polling';
+      this.status = "polling";
       // start polling to retrieve live comments
-      this.pollingInterval = setInterval(this.polling, 10000);
+      this.startedAt = new Date();
+      this.polling();
     },
+    /**
+     * Stop polling
+     */
     async stop() {
-      if (this.pollingInterval) {
-        clearInterval(this.pollingInterval);
-        this.status = 'idle';
-      }
+      this.status = "idle";
     },
     async polling() {
-      try {
-        const messages = YouTube.getChatMessages(this.chatId, this.apiKey, this.nextPageToken);
-        this.nextPageToken = messages.nextPageToken;
-        for (const item of messages.items) {
-          const charCode = item.snippet.displayMessage[0].toUpperCase().charCodeAt();
-          let userOption;
-          // options available from 'A' to 'Z'
-          if (charCode >= 65 && charCode <= 90) {
-            userOption = String.fromCharCode(charCode);
-          }
-          // and also 'Ａ' to 'Ｚ'
-          if (charCode >= 65313 && charCode <= 65338){
-            userOption = String.fromCharCode(charCode - 65248);
-          }
-          if (userOption && this.result[userOption] !== undefined) {
-            this.result[userOption] += 1;
-          }
+      // eslint-disable-next-line
+      while (true) {
+        if (this.status === "idle") {
+          // exit when stop
+          break;
         }
-      } catch (e) {
-        this.showErrorMessage(e.toString());
+        try {
+          const messages = await YouTube.getChatMessages(
+            this.chatId,
+            this.apiKey,
+            this.nextPageToken
+          );
+          this.nextPageToken = messages.nextPageToken;
+          for (const item of messages.items) {
+            // empty message
+            if (!item.snippet.displayMessage) {
+              continue;
+            }
+            // // send before start
+            // if (new Date(item.snippet.publishedAt).valueOf() < this.startedAt.valueOf()) {
+            //   continue;
+            // }
+            const charCode = item.snippet.displayMessage[0]
+              .toUpperCase()
+              .charCodeAt();
+            let userOption;
+            // options available from 'A' to 'Z'
+            if (charCode >= 65 && charCode <= 90) {
+              userOption = String.fromCharCode(charCode);
+            }
+            // and also 'Ａ' to 'Ｚ'
+            if (charCode >= 65313 && charCode <= 65338) {
+              userOption = String.fromCharCode(charCode - 65248);
+            }
+            if (userOption && this.result[userOption] !== undefined) {
+              this.result[userOption] = this.result[userOption] + 1;
+            }
+          }
+          // cooldown
+          await utils.sleep(messages.pollingIntervalMillis);
+        } catch (e) {
+          this.showErrorMessage(e.toString());
+        }
       }
     },
     saveOptions() {
-      // eslint-disable-next-line
-      fs.writeFileSync(path.resolve(__static, './server/options.json'), JSON.stringify(this.options));
+      fs.writeFileSync(
+        // eslint-disable-next-line
+        path.resolve(__static, "./server/options.json"),
+        JSON.stringify(this.options)
+      );
     },
     handlePollOptionDelete(index) {
       this.options = [
