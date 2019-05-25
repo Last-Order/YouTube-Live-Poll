@@ -7,7 +7,10 @@ export default {
         'fillBasicInfo': '基本信息填写',
         'setPollOptions': '设置投票选项',
         'addOption': '添加选项',
+        'addOptionLabel': '选项内容',
+        'pleaseInputOptionLabel': '请输入选项内容',
         'saveOptions': '保存',
+        'optionSaved': '选项已保存'
     },
     'control': {
         'title': '控制',

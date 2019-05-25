@@ -23,3 +23,6 @@ yarn-error.log*
 #Electron-builder output
 /dist_electron
 /dist_binary
+
+public/server/options.json
+runtime/*.json

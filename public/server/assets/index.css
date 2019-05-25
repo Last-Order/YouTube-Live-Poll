@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.option-list-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.option-item {
+    min-width: 380px;
+    width: 380px;
+    height: 40px;
+    background-color: #7fddff;
+    box-shadow: 2px 2px 2px #aaa;
+    box-sizing: border-box;
+    margin: 10px;
+    opacity: 0.7;
+    border-radius: 2px;
+    align-items: center;
+    display: flex;
+}
+.option-item-index {
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+    width: 20px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 20px;
+    color: black;
+    font-weight: bold;
+    background-color: #206e8b;
+    color: white;
+}
+.option-item-content {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

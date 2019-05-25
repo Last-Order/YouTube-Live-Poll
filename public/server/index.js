@@ -14,13 +14,15 @@ app.get('/', (req, res) => {
 app.get('/options', (req, res) => {
   res.json(
     JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, './options.json')).toString()
+      fs.readFileSync(path.resolve(__dirname, '../../runtime/options.json')).toString()
     )
   );
 });
 
-app.use('/assets', express.static(path.join(__dirname, '../assets')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
+  socket.on('refresh-options', () => {
+    socket.broadcast.emit('refresh-options', '');
+  });
 });

@@ -3,6 +3,9 @@
     <v-dialog v-model="showSetAPIKeyDialog" :persistent="true">
       <set-api-key-dialog @error="showErrorMessage" @saved="showSetAPIKeyDialog = false"/>
     </v-dialog>
+    <v-dialog v-model="showAddOptionDialog">
+      <add-option-dialog @error="showErrorMessage" @added="handleOptionAdded" />
+    </v-dialog>
     <v-snackbar v-model="error.show" color="error" :top="true" :timeout="5000">
       {{ error.message }}
       <v-btn dark flat @click="error.show = false">×</v-btn>
@@ -35,7 +38,7 @@
           <v-card-text>
             <h3>{{ $vuetify.t('$vuetify.index.setPollOptions') }}</h3>
             <poll-option-list :options="options" @delete="handlePollOptionDelete"/>
-            <v-btn flat>{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
+            <v-btn flat @click="showAddOptionDialog = true">{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
             <v-btn
               color="primary"
               flat
@@ -81,12 +84,14 @@
 </template>
 <script>
 import SetAPIKeyDialog from "./Home/SetAPIKey";
+import AddOptionDialog from "./Home/AddOption";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
 import YouTube from "../services/youtube";
 import utils from "../utils/common";
 const fs = require("fs");
 const path = require("path");
+const socketio = require("socket.io-client");
 import "./Index.css";
 
 export default {
@@ -94,6 +99,7 @@ export default {
     return {
       apiKey: undefined,
       showSetAPIKeyDialog: false,
+      showAddOptionDialog: false,
       startButtonLoading: false,
       videoUrl: "",
       videoId: "",
@@ -106,14 +112,7 @@ export default {
         show: false,
         message: ""
       },
-      options: [
-        {
-          label: "AAAAA"
-        },
-        {
-          label: "BBBBB"
-        }
-      ],
+      options: [],
       result: {},
       languages: [
         {
@@ -129,11 +128,14 @@ export default {
       status: "idle",
       pollingInterval: undefined,
       nextPageToken: undefined,
-      startedAt: new Date()
+      startedAt: new Date(),
+      polledUser: {},
+      socketClient: undefined
     };
   },
   mounted() {
     this.checkInstall();
+    this.socketClient = socketio("http://localhost:9317");
     if (localStorage.getItem("language")) {
       this.nowLanguage = localStorage.getItem("language");
     }
@@ -188,6 +190,7 @@ export default {
       this.status = "polling";
       // start polling to retrieve live comments
       this.startedAt = new Date();
+      this.polledUser = {};
       this.polling();
     },
     /**
@@ -215,10 +218,13 @@ export default {
             if (!item.snippet.displayMessage) {
               continue;
             }
-            // // send before start
-            // if (new Date(item.snippet.publishedAt).valueOf() < this.startedAt.valueOf()) {
-            //   continue;
-            // }
+            // send before start
+            if (
+              new Date(item.snippet.publishedAt).valueOf() <
+              this.startedAt.valueOf()
+            ) {
+              continue;
+            }
             const charCode = item.snippet.displayMessage[0]
               .toUpperCase()
               .charCodeAt();
@@ -245,15 +251,23 @@ export default {
     saveOptions() {
       fs.writeFileSync(
         // eslint-disable-next-line
-        path.resolve(__static, "./server/options.json"),
+        path.resolve(__static, "../runtime/options.json"),
         JSON.stringify(this.options)
       );
+      this.socketClient.emit("refresh-options", "");
+      this.showNotice(this.$vuetify.t("$vuetify.index.optionSaved"));
     },
     handlePollOptionDelete(index) {
       this.options = [
         ...this.options.slice(0, index),
         ...this.options.slice(index + 1)
       ];
+    },
+    handleOptionAdded(label) {
+      this.options.push({
+        label
+      });
+      this.showAddOptionDialog = false;
     },
     showErrorMessage(message) {
       this.error.show = true;
@@ -270,7 +284,8 @@ export default {
   components: {
     "set-api-key-dialog": SetAPIKeyDialog,
     PollOptionList,
-    ResultGraph
+    ResultGraph,
+    AddOptionDialog
   }
 };
 </script>

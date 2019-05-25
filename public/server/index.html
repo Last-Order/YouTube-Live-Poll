@@ -1,13 +1,60 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script src="assets/vue.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="assets/index.css">
-    </head>
-    <body>
-        
-    </body>
-    <script>
-        document.write(navigator.userAgent);
-    </script>
+
+<head>
+    <script src="assets/vue.min.js"></script>
+    <script src="assets/axios.min.js"></script>
+    <script src="assets/socket.io-client.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="option-list-container">
+            <template v-for="(item, index) in options">
+                <div class="option-item" :key="index">
+                    <div class="option-item-index">{{ index | indexToLetter }}</div>
+                    <div class="option-item-content">
+                        <span>{{ item.label }}</span>
+                    </div>
+                </div>
+            </template>
+            <!-- <div class="option-item">
+                <div class="option-item-index">A</div>
+                <div class="option-item-content">
+                    <span>曾经获得诺贝尔物理学奖的美国物理学家默里</span>
+                </div>
+            </div>
+            <div class="option-item"></div>
+            <div class="option-item"></div>
+            <div class="option-item"></div> -->
+        </div>
+    </div>
+</body>
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            options: []
+        },
+        filters: {
+            indexToLetter(index) {
+                return String.fromCharCode(65 + index);
+            }
+        },
+        async mounted() {
+            this.options = await this.getOptionList();
+            const socketClient = io.connect('/');
+            socketClient.on('refresh-options', async () => {
+                this.options = await this.getOptionList();
+            });
+        },
+        methods: {
+            async getOptionList() {
+                return (await axios.get('/options')).data;
+            }
+        }
+    });
+</script>
+
 </html>
