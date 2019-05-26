@@ -25,7 +25,8 @@ export default {
     },
     'display': {
         'title': '展示',
-        'instruction': '请在 OBS Studio 中添加浏览器源，输入以上地址'
+        'instruction': '请在 OBS Studio 中添加浏览器源，输入以上地址；推荐浏览器宽度：1600',
+        'collectPollRealtime': '实时反映投票结果'
     },
     "noDataText": "无可用数据"
 }

@@ -8,6 +8,7 @@ import {
 const path = require('path');
 const { fork } = require('child_process')
 const ps = fork(`${__static}/server/index.js`)
+const fs = require('fs');
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -86,5 +87,9 @@ if (isDevelopment) {
     process.on('SIGTERM', () => {
       app.quit()
     })
+  }
+} else {
+  if (!fs.existsSync(path.resolve(__static, '../runtime'))) {
+    fs.mkdirSync(path.resolve(__static, '../runtime'));
   }
 }

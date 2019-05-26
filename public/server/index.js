@@ -22,7 +22,10 @@ app.get('/options', (req, res) => {
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 io.on('connection', function (socket) {
-  socket.on('refresh-options', () => {
-    socket.broadcast.emit('refresh-options', '');
+  socket.on('refresh-options', (data) => {
+    socket.broadcast.emit('refresh-options', data);
+  });
+  socket.on('update-result', (data) => {
+    socket.broadcast.emit('update-result', data);
   });
 });

@@ -4,7 +4,7 @@
       <set-api-key-dialog @error="showErrorMessage" @saved="showSetAPIKeyDialog = false"/>
     </v-dialog>
     <v-dialog v-model="showAddOptionDialog">
-      <add-option-dialog @error="showErrorMessage" @added="handleOptionAdded" />
+      <add-option-dialog @error="showErrorMessage" @added="handleOptionAdded"/>
     </v-dialog>
     <v-snackbar v-model="error.show" color="error" :top="true" :timeout="5000">
       {{ error.message }}
@@ -38,10 +38,14 @@
           <v-card-text>
             <h3>{{ $vuetify.t('$vuetify.index.setPollOptions') }}</h3>
             <poll-option-list :options="options" @delete="handlePollOptionDelete"/>
-            <v-btn flat @click="showAddOptionDialog = true">{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
+            <v-btn
+              flat
+              @click="showAddOptionDialog = true"
+            >{{ $vuetify.t('$vuetify.index.addOption') }}</v-btn>
             <v-btn
               color="primary"
               flat
+              :disabled="status !== 'idle'"
               @click="saveOptions"
             >{{ $vuetify.t('$vuetify.index.saveOptions') }}</v-btn>
           </v-card-text>
@@ -55,6 +59,7 @@
               color="primary"
               @click="start"
               :loading="startButtonLoading"
+              :disabled="status !== 'idle'"
             >{{ $vuetify.t('$vuetify.control.start') }}</v-btn>
             <v-btn
               v-if="status === 'polling'"
@@ -75,7 +80,15 @@
             <blockquote>
               <code>http://localhost:9317</code>
             </blockquote>
+            <br>
             <p>{{ $vuetify.t('$vuetify.display.instruction') }}</p>
+            <v-form>
+              <v-checkbox
+                :disabled="status !== 'idle'"
+                :label="$vuetify.t('$vuetify.display.collectPollRealtime')"
+                v-model="collectPollRealtime"
+              ></v-checkbox>
+            </v-form>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -130,7 +143,8 @@ export default {
       nextPageToken: undefined,
       startedAt: new Date(),
       polledUser: {},
-      socketClient: undefined
+      socketClient: undefined,
+      collectPollRealtime: false
     };
   },
   mounted() {
@@ -198,6 +212,7 @@ export default {
      */
     async stop() {
       this.status = "idle";
+      this.socketClient.emit("update-result", JSON.stringify(this.result));
     },
     async polling() {
       // eslint-disable-next-line
@@ -225,6 +240,12 @@ export default {
             ) {
               continue;
             }
+            // duplicated user
+            const userChannelId = item.authorDetails.channelId;
+            if (this.polledUser[userChannelId]) {
+              continue;
+            }
+            this.polledUser[userChannelId] = true;
             const charCode = item.snippet.displayMessage[0]
               .toUpperCase()
               .charCodeAt();
@@ -241,10 +262,15 @@ export default {
               this.result[userOption] = this.result[userOption] + 1;
             }
           }
+          if (this.collectPollRealtime) {
+            // update display
+            this.socketClient.emit("update-result", JSON.stringify(this.result));
+          }
           // cooldown
           await utils.sleep(messages.pollingIntervalMillis);
         } catch (e) {
           this.showErrorMessage(e.toString());
+          await utils.sleep(3000);
         }
       }
     },

@@ -13,21 +13,19 @@
         <div class="option-list-container">
             <template v-for="(item, index) in options">
                 <div class="option-item" :key="index">
-                    <div class="option-item-index">{{ index | indexToLetter }}</div>
+                    <div :class="itemLeftClass">
+                        <span v-if="status === 'polling' || status === 'idle'">
+                            {{ index | indexToLetter }}
+                        </span>
+                        <span v-else>
+                            {{ result[index] }}
+                        </span>
+                    </div>
                     <div class="option-item-content">
                         <span>{{ item.label }}</span>
                     </div>
                 </div>
             </template>
-            <!-- <div class="option-item">
-                <div class="option-item-index">A</div>
-                <div class="option-item-content">
-                    <span>曾经获得诺贝尔物理学奖的美国物理学家默里</span>
-                </div>
-            </div>
-            <div class="option-item"></div>
-            <div class="option-item"></div>
-            <div class="option-item"></div> -->
         </div>
     </div>
 </body>
@@ -35,7 +33,17 @@
     const vm = new Vue({
         el: '#app',
         data: {
-            options: []
+            options: [],
+            result: [],
+            status: 'idle',
+        },
+        computed: {
+            itemLeftClass() {
+                return {
+                    "option-item-index": this.status === 'idle' || this.status === 'polling',
+                    "option-item-result": this.status === 'result'
+                }
+            }
         },
         filters: {
             indexToLetter(index) {
@@ -47,6 +55,18 @@
             const socketClient = io.connect('/');
             socketClient.on('refresh-options', async () => {
                 this.options = await this.getOptionList();
+                this.status = 'polling';
+            });
+            socketClient.on('update-result', (result) => {
+                const parsedResult = JSON.parse(result);
+                const total = Object.values(parsedResult).reduce((a, b) => a + b);
+                this.result = Object.values(parsedResult).map((i) => {
+                    if (total === 0) {
+                        return '0%';
+                    }
+                    return `${(i / total * 100).toFixed(1)}%`;
+                });
+                this.status = 'result';
             });
         },
         methods: {
