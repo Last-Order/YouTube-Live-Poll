@@ -10,7 +10,7 @@
 
 <body>
     <div id="app">
-        <div class="option-list-container">
+        <div class="option-list-container" :class="containerClass">
             <template v-for="(item, index) in options">
                 <div class="option-item" :key="index">
                     <div :class="itemLeftClass">
@@ -36,12 +36,20 @@
             options: [],
             result: [],
             status: 'idle',
+            nowLanguage: navigator.language.slice(0, 2)
         },
         computed: {
             itemLeftClass() {
                 return {
                     "option-item-index": this.status === 'idle' || this.status === 'polling',
                     "option-item-result": this.status === 'result'
+                }
+            },
+            containerClass() {
+                return {
+                    "lang-ja": this.nowLanguage === 'ja',
+                    "lang-zh": this.nowLanguage === 'zh',
+                    "lang-en": this.nowLanguage === 'en'
                 }
             }
         },
@@ -56,6 +64,9 @@
             socketClient.on('refresh-options', async () => {
                 this.options = await this.getOptionList();
                 this.status = 'polling';
+            });
+            socketClient.on('update-language', async (language) => {
+                this.nowLanguage = language;
             });
             socketClient.on('update-result', (result) => {
                 const parsedResult = JSON.parse(result);

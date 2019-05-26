@@ -62,3 +62,12 @@ body {
     text-overflow: ellipsis;
     overflow: hidden;
 }
+.lang-ja {
+    font-family: Arial, Helvetica, 'Yu Gothic UI', 'Meiryo', sans-serif;
+}
+.lang-zh {
+    font-family: Arial, Helvetica, 'Noto Sans CJk SC', sans-serif;
+}
+.lang-en {
+    font-family: Arial, Helvetica, sans-serif;
+}

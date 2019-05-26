@@ -1,5 +1,5 @@
 <template>
-  <v-container class="main-container" ref="mainContainer" grid-list-md>
+  <v-container class="main-container" ref="mainContainer" grid-list-md :class="containerClass">
     <v-dialog v-model="showSetAPIKeyDialog" :persistent="true">
       <set-api-key-dialog @error="showErrorMessage" @saved="showSetAPIKeyDialog = false"/>
     </v-dialog>
@@ -151,6 +151,15 @@ export default {
       collectPollRealtime: false
     };
   },
+  computed: {
+    containerClass() {
+      return {
+        "lang-ja": this.nowLanguage === 'ja',
+        "lang-zh": this.nowLanguage === 'zh',
+        "lang-en": this.nowLanguage === 'en'
+      }
+    }
+  },
   mounted() {
     this.checkInstall();
     this.socketClient = socketio("http://localhost:9317");
@@ -161,6 +170,7 @@ export default {
   watch: {
     nowLanguage: function(language) {
       localStorage.setItem("language", language);
+      this.socketClient.emit('update-language', language);
       this.$vuetify.lang.current = language;
     }
   },
@@ -285,6 +295,7 @@ export default {
         JSON.stringify(this.options)
       );
       this.socketClient.emit("refresh-options", "");
+      this.socketClient.emit('update-language', this.nowLanguage);
       this.showNotice(this.$vuetify.t("$vuetify.index.optionSaved"));
     },
     handlePollOptionDelete(index) {

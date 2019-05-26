@@ -15,6 +15,12 @@ module.exports = {
                 // config.externals(['uws']);
             },
             builderOptions: {
+                // files: [
+                //     "**/*",
+                //     "!node_modules",
+                //     "node_modules/socket.io",
+                //     "node_modules/express"
+                // ],
                 appId: 'moe.sound.sora.ylp',
                 asar: false,
                 artifactName: "ylp-${os}-${version}.${ext}",

@@ -28,6 +28,9 @@ io.on('connection', function (socket) {
   socket.on('update-result', (data) => {
     socket.broadcast.emit('update-result', data);
   });
+  socket.on('update-language', (data) => {
+    socket.broadcast.emit('update-language', data);
+  });
 });
 
 module.exports = {};
