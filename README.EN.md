@@ -30,8 +30,8 @@ A. Coming soon.
 
 ## Screenshots
 
-![TIM截图20190526210348.jpg](https://i.loli.net/2019/05/26/5cea8ec40eafd52019.jpg)
-![TIM截图20190526210433.jpg](https://i.loli.net/2019/05/26/5cea8ef48b52459787.jpg)
+![TIM截图20190526210348.jpg](https://i.loli.net/2019/05/26/5cea9a70ba68718275.jpg)
+![TIM截图20190526210433.jpg](https://i.loli.net/2019/05/26/5cea9a71ed5b959247.jpg)
 
 ## Copyright
 
