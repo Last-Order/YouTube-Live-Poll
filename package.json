@@ -1,26 +1,23 @@
 {
   "name": "youtube-live-poll",
   "version": "1.0.0",
+  "private": true,
+  "description": "Create polls for YouTube Live Streaming",
   "author": {
     "name": "Eridanus Sora",
     "email": "sora@sound.moe"
   },
-  "homepage": "https://github.com/Last-Order/YouTube-Live-Poll",
-  "description": "Create polls for YouTube Live Streaming",
-  "repository": {
-    "url": "git@github.com:Last-Order/YouTube-Live-Poll.git"
-  },
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "dev": "vue-cli-service electron:serve",
-    "electron:build-win": "vue-cli-service electron:build --win --publish never",
+    "electron:build": "vue-cli-service electron:build",
     "electron:build-linux": "vue-cli-service electron:build --linux --publish never",
     "electron:build-macos": "vue-cli-service electron:build --mac --publish never",
-    "electron:serve": "vue-cli-service electron:serve",
+    "electron:build-win": "vue-cli-service electron:build --win --publish never",
     "electron:generate-icons": "electron-icon-builder --input=./public/logo.png --output=build --flatten",
+    "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "release": "electron-builder --publish onTagOrDraft"
@@ -29,13 +26,13 @@
   "dependencies": {
     "axios": "^0.18.0",
     "echarts": "^4.2.1",
+    "electron-log": "^3.0.5",
     "express": "^4.17.0",
-    "flv.js": "^1.5.0",
-    "hls.js": "^0.12.3",
+    "express-ws": "^4.0.0",
     "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "vue": "^2.6.6",
     "vue-echarts": "^4.0.3",
-    "vue-grid-layout": "^2.3.4",
     "vuetify": "^1.5.5",
     "vuex": "^3.1.0"
   },
@@ -52,10 +49,11 @@
     "material-design-icons-iconfont": "^4.0.5",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "vue-cli-plugin-electron-builder": "^1.1.3",
+    "vue-cli-plugin-electron-builder": "^1.3.4",
     "vue-cli-plugin-vuetify": "^0.5.0",
     "vue-template-compiler": "^2.5.21",
-    "vuetify-loader": "^1.0.5"
+    "vuetify-loader": "^1.0.5",
+    "webpack": "^4.32.2"
   },
   "eslintConfig": {
     "root": true,
@@ -80,5 +78,9 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "homepage": "https://github.com/Last-Order/YouTube-Live-Poll",
+  "repository": {
+    "url": "git@github.com:Last-Order/YouTube-Live-Poll.git"
+  }
 }

@@ -10,7 +10,9 @@ export default {
         'addOptionLabel': '选项内容',
         'pleaseInputOptionLabel': '请输入选项内容',
         'saveOptions': '保存',
-        'optionSaved': '选项已保存'
+        'optionSaved': '选项已保存',
+        'howToGetAPIKey': '如何获得API Key',
+        'howToGetAPIKeyLink': 'https://elfsight.com/help/how-to-get-youtube-api-key/'
     },
     'control': {
         'title': '控制',

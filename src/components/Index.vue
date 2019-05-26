@@ -135,9 +135,13 @@ export default {
         {
           label: "日本語",
           value: "ja"
+        },
+        {
+          label: 'English',
+          value: 'en'
         }
       ],
-      nowLanguage: "zh",
+      nowLanguage: navigator.language.slice(0, 2),
       status: "idle",
       pollingInterval: undefined,
       nextPageToken: undefined,

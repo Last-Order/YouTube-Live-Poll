@@ -6,8 +6,7 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 const path = require('path');
-const { fork } = require('child_process')
-const ps = fork(`${__static}/server/index.js`)
+const server = __non_webpack_require__(`${__static}/server/index.server.js`);
 const fs = require('fs');
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -46,7 +45,6 @@ app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  ps.kill();
   if (process.platform !== 'darwin') {
     app.quit()
   }

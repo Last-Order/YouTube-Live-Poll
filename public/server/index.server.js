@@ -29,3 +29,5 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('update-result', data);
   });
 });
+
+module.exports = {};
