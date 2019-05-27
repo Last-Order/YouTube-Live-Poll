@@ -62,10 +62,11 @@ export default class YouTube extends EventEmitter {
     }
     async disconnect() {
         this.status = 'idle';
+        this.polledUser = {};
     }
     static async getVideoId(url) {
         let videoId;
-        if (url.includes('youtu.be')) {
+        if (url.includes('youtu.be/')) {
             videoId = url.match(/\/(.+)/)[1];
         } else if (url.includes('channel')) {
             // get later

@@ -126,6 +126,7 @@ export default {
       },
       options: [],
       result: {},
+      resultBuffer: {},
       languages: [
         {
           label: "中文",
@@ -144,7 +145,8 @@ export default {
       status: "idle",
       socketClient: undefined,
       collectPollRealtime: false,
-      commentListener: undefined
+      commentListener: undefined,
+      commitResultBufferInterval: undefined
     };
   },
   computed: {
@@ -210,13 +212,15 @@ export default {
       this.startButtonLoading = false;
       // reset result
       const result = {};
+      const resultBuffer = {};
       for (const index in this.options) {
         result[String.fromCharCode(65 + parseInt(index))] = 0;
+        resultBuffer[String.fromCharCode(65 + parseInt(index))] = 0;
       }
       this.result = result;
+      this.resultBuffer = resultBuffer;
       this.status = "polling";
       // start polling to retrieve live comments
-      this.polledUser = {};
       this.polling();
     },
     /**
@@ -226,6 +230,7 @@ export default {
       this.status = "idle";
       this.socketClient.emit("update-result", JSON.stringify(this.result));
       this.commentListener.disconnect();
+      clearInterval(this.commitResultBufferInterval);
     },
     async polling() {
       this.commentListener.connect();
@@ -241,7 +246,7 @@ export default {
           userOption = String.fromCharCode(charCode - 65248);
         }
         if (userOption && this.result[userOption] !== undefined) {
-          this.result[userOption] = this.result[userOption] + 1;
+          this.incResult(userOption);
         }
         if (this.collectPollRealtime) {
           // update display
@@ -251,6 +256,16 @@ export default {
       this.commentListener.on("error", e => {
         this.showErrorMessage(e.toString());
       });
+      this.commitResultBufferInterval = setInterval(this.commitResultBuffer, 1500);
+    },
+    incResult(key) {
+      this.resultBuffer[key] += 1;
+    },
+    commitResultBuffer() {
+      for (const key of Object.keys(this.resultBuffer)) {
+        this.result[key] = this.result[key] + this.resultBuffer[key];
+        this.resultBuffer[key] = 0;
+      }
     },
     saveOptions() {
       fs.writeFileSync(
