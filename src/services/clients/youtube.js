@@ -15,7 +15,6 @@ export default class YouTube extends EventEmitter {
     async connect() {
         this.status = "polling";
         this.startedAt = new Date();
-        this.polledUser = {};
         // eslint-disable-next-line
         while (true) {
             if (this.status === "idle") {
@@ -41,12 +40,7 @@ export default class YouTube extends EventEmitter {
                     ) {
                         continue;
                     }
-                    // duplicated user
                     const userChannelId = item.authorDetails.channelId;
-                    if (this.polledUser[userChannelId]) {
-                        continue;
-                    }
-                    this.polledUser[userChannelId] = true;
                     this.emit('comment', {
                         message: item.snippet.displayMessage,
                         userId: userChannelId
@@ -62,7 +56,6 @@ export default class YouTube extends EventEmitter {
     }
     async disconnect() {
         this.status = 'idle';
-        this.polledUser = {};
     }
     static async getVideoId(url) {
         let videoId;

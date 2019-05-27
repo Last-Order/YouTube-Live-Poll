@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import YouTube from './clients/youtube';
+import Bilibili from './clients/bilibili';
 class CommentListener extends EventEmitter {
     constructor({
         url,
@@ -13,6 +14,9 @@ class CommentListener extends EventEmitter {
     async init() {
         if (this.url.includes('youtu.be') || this.url.includes('youtube.com')) {
             this.client = new YouTube(this.url, this.apiKey);
+            await this.client.init();
+        } else if (this.url.includes('live.bilibili.com')) {
+            this.client = new Bilibili(this.url);
             await this.client.init();
         }
     }

@@ -146,7 +146,8 @@ export default {
       socketClient: undefined,
       collectPollRealtime: false,
       commentListener: undefined,
-      commitResultBufferInterval: undefined
+      commitResultBufferInterval: undefined,
+      polledUser: {}
     };
   },
   computed: {
@@ -210,6 +211,7 @@ export default {
         );
       }
       this.startButtonLoading = false;
+      this.polledUser = {};
       // reset result
       const result = {};
       const resultBuffer = {};
@@ -231,6 +233,7 @@ export default {
       this.socketClient.emit("update-result", JSON.stringify(this.result));
       this.commentListener.disconnect();
       clearInterval(this.commitResultBufferInterval);
+      this.commitResultBuffer();
     },
     async polling() {
       this.commentListener.connect();
@@ -246,17 +249,20 @@ export default {
           userOption = String.fromCharCode(charCode - 65248);
         }
         if (userOption && this.result[userOption] !== undefined) {
-          this.incResult(userOption);
-        }
-        if (this.collectPollRealtime) {
-          // update display
-          this.socketClient.emit("update-result", JSON.stringify(this.result));
+          if (!this.polledUser[comment.userId]) {
+            // duplicated user
+            this.incResult(userOption);
+            this.polledUser[comment.userId] = true;
+          }
         }
       });
       this.commentListener.on("error", e => {
         this.showErrorMessage(e.toString());
       });
-      this.commitResultBufferInterval = setInterval(this.commitResultBuffer, 1500);
+      this.commitResultBufferInterval = setInterval(
+        this.commitResultBuffer,
+        1500
+      );
     },
     incResult(key) {
       this.resultBuffer[key] += 1;
@@ -265,6 +271,10 @@ export default {
       for (const key of Object.keys(this.resultBuffer)) {
         this.result[key] = this.result[key] + this.resultBuffer[key];
         this.resultBuffer[key] = 0;
+      }
+      if (this.collectPollRealtime) {
+        // update display
+        this.socketClient.emit("update-result", JSON.stringify(this.result));
       }
     },
     saveOptions() {
