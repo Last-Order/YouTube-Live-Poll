@@ -1,6 +1,6 @@
 # YouTube-Live-Poll
 
-Create polls, collecting comments to count result, providing UI designed to displayed in OBS Studio.
+Create polls, collecting comments to count result, providing UI designed for displaying in the OBS Studio.
 
 ## Brief Instruction
 
@@ -9,6 +9,12 @@ Create polls, collecting comments to count result, providing UI designed to disp
 3. Add option labels.
 4. Add a browser source in OBS following the instrction in the program. 
 5. Start polling.
+
+## Supported Sites
+
+* YouTube
+* Bilibili
+
 
 ## FAQ
 
