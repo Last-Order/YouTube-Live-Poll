@@ -14,6 +14,7 @@ module.exports = {
                 config.mode('development');
                 // config.externals(['uws']);
             },
+            externals: ['socket.io'],
             builderOptions: {
                 // files: [
                 //     "**/*",
@@ -26,8 +27,12 @@ module.exports = {
                 artifactName: "ylp-${os}-${version}.${ext}",
                 productName: 'YouTube Live Poll',
                 win: {
-                    target: ['msi'],
-                    icon: 'build/icons/icon.ico'
+                    target: ['nsis'],
+                    icon: 'build/icons/icon.ico',
+                },
+                nsis: {
+                    oneClick: false,
+                    allowToChangeInstallationDirectory: true
                 },
                 mac: {
                     category: 'public.app-category.developer-tools',

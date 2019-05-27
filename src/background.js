@@ -8,6 +8,13 @@ import {
 const path = require('path');
 const server = __non_webpack_require__(`${__static}/server/index.server.js`);
 const fs = require('fs');
+if (!fs.existsSync(path.resolve(__static, '../runtime'))) {
+  fs.mkdirSync(path.resolve(__static, '../runtime'));
+}
+process
+  .on('uncaughtException', err => {
+    fs.writeFileSync(path.resolve(__static, '../runtime/log.txt'), err.stack);
+  });
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -19,8 +26,8 @@ protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 1600, 
-    height: 900, 
+    width: 1600,
+    height: 900,
     webPreferences: {
       webSecurity: false
     }
@@ -85,9 +92,5 @@ if (isDevelopment) {
     process.on('SIGTERM', () => {
       app.quit()
     })
-  }
-} else {
-  if (!fs.existsSync(path.resolve(__static, '../runtime'))) {
-    fs.mkdirSync(path.resolve(__static, '../runtime'));
   }
 }
