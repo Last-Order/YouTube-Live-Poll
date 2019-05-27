@@ -25,6 +25,7 @@
   "main": "background.js",
   "dependencies": {
     "axios": "^0.18.0",
+    "danmulive": "0.0.1",
     "echarts": "^4.2.1",
     "electron-log": "^3.0.5",
     "express": "^4.17.0",

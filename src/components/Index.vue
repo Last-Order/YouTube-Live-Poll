@@ -100,8 +100,7 @@ import SetAPIKeyDialog from "./Home/SetAPIKey";
 import AddOptionDialog from "./Home/AddOption";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
-import YouTube from "../services/youtube";
-import utils from "../utils/common";
+import CommentListener from "../services/comment";
 const fs = require("fs");
 const path = require("path");
 const socketio = require("socket.io-client");
@@ -137,27 +136,24 @@ export default {
           value: "ja"
         },
         {
-          label: 'English',
-          value: 'en'
+          label: "English",
+          value: "en"
         }
       ],
       nowLanguage: navigator.language.slice(0, 2),
       status: "idle",
-      pollingInterval: undefined,
-      nextPageToken: undefined,
-      startedAt: new Date(),
-      polledUser: {},
       socketClient: undefined,
-      collectPollRealtime: false
+      collectPollRealtime: false,
+      commentListener: undefined
     };
   },
   computed: {
     containerClass() {
       return {
-        "lang-ja": this.nowLanguage === 'ja',
-        "lang-zh": this.nowLanguage === 'zh',
-        "lang-en": this.nowLanguage === 'en'
-      }
+        "lang-ja": this.nowLanguage === "ja",
+        "lang-zh": this.nowLanguage === "zh",
+        "lang-en": this.nowLanguage === "en"
+      };
     }
   },
   mounted() {
@@ -170,7 +166,7 @@ export default {
   watch: {
     nowLanguage: function(language) {
       localStorage.setItem("language", language);
-      this.socketClient.emit('update-language', language);
+      this.socketClient.emit("update-language", language);
       this.$vuetify.lang.current = language;
     }
   },
@@ -199,9 +195,12 @@ export default {
       }
       this.startButtonLoading = true;
       // Get live basic information
+      this.commentListener = new CommentListener({
+        url: this.videoUrl,
+        apiKey: this.apiKey
+      });
       try {
-        this.videoId = await YouTube.getVideoId(this.videoUrl);
-        this.chatId = await YouTube.getChatId(this.videoId, this.apiKey);
+        await this.commentListener.init();
       } catch (e) {
         this.startButtonLoading = false;
         return this.showErrorMessage(
@@ -217,7 +216,6 @@ export default {
       this.result = result;
       this.status = "polling";
       // start polling to retrieve live comments
-      this.startedAt = new Date();
       this.polledUser = {};
       this.polling();
     },
@@ -227,66 +225,32 @@ export default {
     async stop() {
       this.status = "idle";
       this.socketClient.emit("update-result", JSON.stringify(this.result));
+      this.commentListener.disconnect();
     },
     async polling() {
-      // eslint-disable-next-line
-      while (true) {
-        if (this.status === "idle") {
-          // exit when stop
-          break;
+      this.commentListener.connect();
+      this.commentListener.on("comment", comment => {
+        const charCode = comment.message[0].toUpperCase().charCodeAt();
+        let userOption;
+        // options available from 'A' to 'Z'
+        if (charCode >= 65 && charCode <= 90) {
+          userOption = String.fromCharCode(charCode);
         }
-        try {
-          const messages = await YouTube.getChatMessages(
-            this.chatId,
-            this.apiKey,
-            this.nextPageToken
-          );
-          this.nextPageToken = messages.nextPageToken;
-          for (const item of messages.items) {
-            // empty message
-            if (!item.snippet.displayMessage) {
-              continue;
-            }
-            // send before start
-            if (
-              new Date(item.snippet.publishedAt).valueOf() <
-              this.startedAt.valueOf()
-            ) {
-              continue;
-            }
-            // duplicated user
-            const userChannelId = item.authorDetails.channelId;
-            if (this.polledUser[userChannelId]) {
-              continue;
-            }
-            this.polledUser[userChannelId] = true;
-            const charCode = item.snippet.displayMessage[0]
-              .toUpperCase()
-              .charCodeAt();
-            let userOption;
-            // options available from 'A' to 'Z'
-            if (charCode >= 65 && charCode <= 90) {
-              userOption = String.fromCharCode(charCode);
-            }
-            // and also 'Ａ' to 'Ｚ'
-            if (charCode >= 65313 && charCode <= 65338) {
-              userOption = String.fromCharCode(charCode - 65248);
-            }
-            if (userOption && this.result[userOption] !== undefined) {
-              this.result[userOption] = this.result[userOption] + 1;
-            }
-          }
-          if (this.collectPollRealtime) {
-            // update display
-            this.socketClient.emit("update-result", JSON.stringify(this.result));
-          }
-          // cooldown
-          await utils.sleep(messages.pollingIntervalMillis);
-        } catch (e) {
-          this.showErrorMessage(e.toString());
-          await utils.sleep(3000);
+        // and also 'Ａ' to 'Ｚ'
+        if (charCode >= 65313 && charCode <= 65338) {
+          userOption = String.fromCharCode(charCode - 65248);
         }
-      }
+        if (userOption && this.result[userOption] !== undefined) {
+          this.result[userOption] = this.result[userOption] + 1;
+        }
+        if (this.collectPollRealtime) {
+          // update display
+          this.socketClient.emit("update-result", JSON.stringify(this.result));
+        }
+      });
+      this.commentListener.on("error", e => {
+        this.showErrorMessage(e.toString());
+      });
     },
     saveOptions() {
       fs.writeFileSync(
@@ -295,7 +259,7 @@ export default {
         JSON.stringify(this.options)
       );
       this.socketClient.emit("refresh-options", "");
-      this.socketClient.emit('update-language', this.nowLanguage);
+      this.socketClient.emit("update-language", this.nowLanguage);
       this.showNotice(this.$vuetify.t("$vuetify.index.optionSaved"));
     },
     handlePollOptionDelete(index) {
