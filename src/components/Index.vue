@@ -1,6 +1,6 @@
 <template>
   <v-container class="main-container" ref="mainContainer" grid-list-md :class="containerClass">
-    <v-dialog v-model="showSetAPIKeyDialog" :persistent="true">
+    <v-dialog v-model="showSetAPIKeyDialog">
       <set-api-key-dialog @error="showErrorMessage" @saved="showSetAPIKeyDialog = false"/>
     </v-dialog>
     <v-dialog v-model="showAddOptionDialog">
@@ -195,6 +195,10 @@ export default {
         return this.showErrorMessage(
           this.$vuetify.t("$vuetify.control.noOptions")
         );
+      }
+      if ((this.videoUrl.includes('youtube') || this.videoUrl.includes('youtu.be')) && !this.apiKey) {
+        this.showSetAPIKeyDialog = true;
+        return;
       }
       this.startButtonLoading = true;
       // Get live basic information

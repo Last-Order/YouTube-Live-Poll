@@ -16,18 +16,12 @@ module.exports = {
             },
             externals: ['socket.io'],
             builderOptions: {
-                // files: [
-                //     "**/*",
-                //     "!node_modules",
-                //     "node_modules/socket.io",
-                //     "node_modules/express"
-                // ],
                 appId: 'moe.sound.sora.ylp',
                 asar: false,
                 artifactName: "ylp-${os}-${version}.${ext}",
                 productName: 'YouTube Live Poll',
                 win: {
-                    target: ['nsis'],
+                    target: ['portable', 'msi'],
                     icon: 'build/icons/icon.ico',
                 },
                 nsis: {
