@@ -7,10 +7,10 @@ body {
     margin: 5px auto;
 }
 .lang-ja {
-    font-family: Arial, Helvetica, 'Yu Gothic UI', 'Meiryo', sans-serif;
+    font-family: "ヒラギノ角ゴ Pro", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", "MS Gothic", "ＭＳ ゴシック", "Helvetica Neue", Helvetica, Arial, sans-serif 
 }
 .lang-zh {
-    font-family: Arial, Helvetica, 'Noto Sans CJk SC', 'Microsoft Yahei', sans-serif;
+    font-family: "Hiragino Sans GB", "华文细黑", "STHeiti", "微软雅黑", "Microsoft YaHei", SimHei, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .lang-en {
     font-family: Arial, Helvetica, sans-serif;
