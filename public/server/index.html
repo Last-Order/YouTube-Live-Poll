@@ -59,7 +59,6 @@
             }
         },
         async mounted() {
-            this.options = await this.getOptionList();
             const socketClient = io.connect('/');
             socketClient.on('refresh-options', async () => {
                 this.options = await this.getOptionList();
@@ -79,6 +78,11 @@
                 });
                 this.status = 'result';
             });
+            try {
+                this.options = await this.getOptionList();
+            } catch (e) {
+                console.log(e);
+            }
         },
         methods: {
             async getOptionList() {

@@ -17,7 +17,7 @@ module.exports = {
             externals: ['socket.io'],
             builderOptions: {
                 appId: 'moe.sound.sora.ylp',
-                asar: false,
+                // asar: false,
                 artifactName: "ylp-${os}-${version}.${ext}",
                 productName: 'YouTube Live Poll',
                 win: {
