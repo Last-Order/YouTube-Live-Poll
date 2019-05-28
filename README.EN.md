@@ -1,13 +1,13 @@
 # YouTube-Live-Poll
 
-Create polls, collecting comments to count result, providing UI designed for displaying in the OBS Studio.
+Create polls, collecting comments to count results, providing UI designed for displaying in the OBS Studio.
 
 ## Brief Instruction
 
 1. Apply for a YouTube API Key
 2. Start the program and set the API Key.
 3. Add option labels.
-4. Add a browser source in OBS following the instrction in the program. 
+4. Add a browser source in OBS following the instruction in the program. 
 5. Start polling.
 
 ## Supported Sites
@@ -24,7 +24,7 @@ A. Send comments with corresponding letters. Both upper case and lower case can 
 
 Q. How to show poll results?
 
-A. Results will be displayed after you clicked "Start polling" and update in realtime if you checked "Display the poll results in realtime". Or else, the results will be displayed after you stop the polling.
+A. Results will be displayed after you clicked "Start polling" and update in realtime if you checked "Display the poll results in realtime". Otherwise, the results will be displayed after you stop the polling.
 
 Q. Is this program free?
 
