@@ -30,5 +30,11 @@ export default {
         'instruction': 'Please add an browser source in OBS Studio with the address above. Recommended browser width: 1600.',
         'collectPollRealtime': 'Display poll results in realtime'
     },
-    "noDataText": "No Data"
+    'setting': {
+        'credential': 'Credentials',
+        'about': 'About',
+        'setAPIKey': 'Set YouTube API Key',
+        'save': 'Save'
+    },
+    'noDataText': 'No Data'
 }

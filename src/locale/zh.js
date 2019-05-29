@@ -30,5 +30,11 @@ export default {
         'instruction': '请在 OBS Studio 中添加浏览器源，输入以上地址；推荐浏览器宽度：1600',
         'collectPollRealtime': '实时反映投票结果'
     },
-    "noDataText": "无可用数据"
+    'setting': {
+        'credential': '凭据',
+        'about': '关于',
+        'setAPIKey': '设定 YouTube API Key',
+        'save': '保存'
+    },
+    'noDataText': '无可用数据'
 }

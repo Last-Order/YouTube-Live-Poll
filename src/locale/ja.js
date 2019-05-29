@@ -30,5 +30,11 @@ export default {
         'instruction': 'OBS Studioソースでブラウザを追加して上記のアドレスを入力してください；推奨ブラウザ幅：1600',
         'collectPollRealtime': 'リアルタイム結果表示'
     },
-    "noDataText": "データがありません"
+    'setting': {
+        'credential': 'クレデンシャル',
+        'about': 'バージョン情報',
+        'setAPIKey': 'YouTube API Keyの設定',
+        'save': '保存する'
+    },
+    'noDataText': 'データがありません'
 }

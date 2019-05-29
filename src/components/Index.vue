@@ -1,5 +1,19 @@
 <template>
   <v-container class="main-container" ref="mainContainer" grid-list-md :class="containerClass">
+    <div class="control-panel-container">
+      <v-icon small @click="showSettingPanel = true">settings</v-icon>
+      <v-icon small @click="refresh">refresh</v-icon>
+    </div>
+    <v-dialog v-model="showSettingPanel">
+      <v-card>
+        <v-card-title>
+          <span class="headline">设置</span>
+        </v-card-title>
+        <v-card-text>
+          <setting-panel></setting-panel>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="showSetAPIKeyDialog">
       <set-api-key-dialog @error="showErrorMessage" @saved="showSetAPIKeyDialog = false"/>
     </v-dialog>
@@ -101,6 +115,7 @@ import AddOptionDialog from "./Home/AddOption";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
 import CommentListener from "../services/comment";
+import SettingPanel from './Settings/Index';
 const fs = require("fs");
 const path = require("path");
 const socketio = require("socket.io-client");
@@ -112,6 +127,7 @@ export default {
       apiKey: undefined,
       showSetAPIKeyDialog: false,
       showAddOptionDialog: false,
+      showSettingPanel: false,
       startButtonLoading: false,
       videoUrl: "",
       videoId: "",
@@ -313,13 +329,17 @@ export default {
     },
     hideNotice() {
       this.notice.show = false;
+    },
+    refresh() {
+      location.reload();
     }
   },
   components: {
     "set-api-key-dialog": SetAPIKeyDialog,
     PollOptionList,
     ResultGraph,
-    AddOptionDialog
+    AddOptionDialog,
+    SettingPanel
   }
 };
 </script>

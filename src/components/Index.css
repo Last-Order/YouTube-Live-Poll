@@ -15,3 +15,13 @@ body {
 .lang-en {
     font-family: Arial, Helvetica, sans-serif;
 }
+.control-panel-container {
+    right: 5px;
+    top: 5px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+.control-panel-container i {
+    cursor: pointer;
+}
