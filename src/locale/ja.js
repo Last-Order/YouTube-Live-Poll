@@ -1,8 +1,8 @@
 export default {
     'index': {
-        'setAPIKey': 'YouTube APIキーの設定',
+        'setAPIKey': 'YouTube API Keyの設定',
         'confirm': '確認する',
-        'pleaseInputAPIKey': 'YouTube APIキーを正しく入力してください',
+        'pleaseInputAPIKey': 'YouTube API Keyを正しく入力してください',
         'pleaseInputVideoUrl': 'ライブURLを入力してください',
         'fillBasicInfo': '基本情報',
         'setPollOptions': '選択肢設定',
@@ -11,7 +11,7 @@ export default {
         'pleaseInputOptionLabel': '選択肢の内容を入力してください',
         'saveOptions': '保存する',
         'optionSaved': '保存しました',
-        'howToGetAPIKey': 'APIキーの取得方法',
+        'howToGetAPIKey': 'API Keyの取得方法',
         'howToGetAPIKeyLink': 'https://www.sourcenext.com/support/qa/?faq=HP-08470/'
     },
     'control': {
@@ -28,7 +28,7 @@ export default {
     'display': {
         'title': '結果表示',
         'instruction': 'OBS Studioでブラウザを追加して上記のアドレスを入力してください；推奨ブラウザ幅：1600',
-        'collectPollRealtime': 'リアルタイム投票結果'
+        'collectPollRealtime': 'リアルタイム結果表示'
     },
     "noDataText": "データがありません"
 }
