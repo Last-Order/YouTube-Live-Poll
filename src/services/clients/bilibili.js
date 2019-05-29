@@ -18,7 +18,7 @@ export default class Bilibili extends EventEmitter {
         this.danmuProvider.connect();
         this.danmuParser.on("data", data => {
             if (data.type == "danmu") {
-                if (data.value.cmd == "DANMU_MSG") {
+                if (data.value.cmd.startsWith("DANMU_MSG")) {
                     let userId = data.value.info[2][1];
                     let message = data.value.info[1];
                     this.emit('comment', {
