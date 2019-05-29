@@ -27,7 +27,7 @@ export default {
     },
     'display': {
         'title': '結果表示',
-        'instruction': 'OBS Studioでブラウザを追加して上記のアドレスを入力してください；推奨ブラウザ幅：1600',
+        'instruction': 'OBS Studioソースでブラウザを追加して上記のアドレスを入力してください；推奨ブラウザ幅：1600',
         'collectPollRealtime': 'リアルタイム結果表示'
     },
     "noDataText": "データがありません"
