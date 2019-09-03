@@ -115,7 +115,7 @@ import AddOptionDialog from "./Home/AddOption";
 import PollOptionList from "./Home/PollOptionList";
 import ResultGraph from "./Home/ResultGraph";
 import CommentListener from "../services/comment";
-import SettingPanel from './Settings/Index';
+import SettingPanel from "./Settings/Index";
 const fs = require("fs");
 const path = require("path");
 const socketio = require("socket.io-client");
@@ -212,7 +212,11 @@ export default {
           this.$vuetify.t("$vuetify.control.noOptions")
         );
       }
-      if ((this.videoUrl.includes('youtube') || this.videoUrl.includes('youtu.be')) && !this.apiKey) {
+      if (
+        (this.videoUrl.includes("youtube") ||
+          this.videoUrl.includes("youtu.be")) &&
+        !this.apiKey
+      ) {
         this.showSetAPIKeyDialog = true;
         return;
       }
