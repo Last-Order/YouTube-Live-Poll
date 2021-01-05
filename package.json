@@ -24,7 +24,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "danmulive": "0.0.4",
     "echarts": "^4.2.1",
     "electron-log": "^3.0.7",
